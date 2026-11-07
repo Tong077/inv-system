@@ -1,7 +1,61 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GoodsReceiptController;
+use App\Http\Controllers\GoodsReceiptItemController;
+use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\IngredientPriceHistoryController;
+use App\Http\Controllers\MenuCategoryController;
+use App\Http\Controllers\MenuItemController;
+use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\PurchaseOrderItemController;
+use App\Http\Controllers\RecipeIngredientController;
+use App\Http\Controllers\RecipeInstructionController;
+use App\Http\Controllers\RecipeOtherCostController;
+use App\Http\Controllers\RecipeVersionController;
+use App\Http\Controllers\StockAdjustmentController;
+use App\Http\Controllers\StockAdjustmentItemController;
+use App\Http\Controllers\StockBalanceController;
+use App\Http\Controllers\StockCountController;
+use App\Http\Controllers\StockCountItemController;
+use App\Http\Controllers\StockLocationController;
+use App\Http\Controllers\StockMovementController;
+use App\Http\Controllers\StockTransferController;
+use App\Http\Controllers\StockTransferItemController;
+use App\Http\Controllers\StockWasteController;
+use App\Http\Controllers\StockWasteItemController;
+use App\Http\Controllers\SupplierContactController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\SupplierPaymentController;
+use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', DashboardController::class)->name('dashboard');
+
+Route::get('/items', [IngredientController::class, 'index'])->name('items.index');
+Route::get('/units', [UnitController::class, 'index'])->name('units.index');
+Route::get('/menu-categories', [MenuCategoryController::class, 'index'])->name('menu-categories.index');
+Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
+Route::get('/supplier-contacts', [SupplierContactController::class, 'index'])->name('supplier-contacts.index');
+Route::get('/stock-locations', [StockLocationController::class, 'index'])->name('stock-locations.index');
+Route::get('/menu-items', [MenuItemController::class, 'index'])->name('menu-items.index');
+Route::get('/ingredient-price-histories', [IngredientPriceHistoryController::class, 'index'])->name('ingredient-price-histories.index');
+Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])->name('purchase-orders.index');
+Route::get('/purchase-order-items', [PurchaseOrderItemController::class, 'index'])->name('purchase-order-items.index');
+Route::get('/goods-receipts', [GoodsReceiptController::class, 'index'])->name('goods-receipts.index');
+Route::get('/goods-receipt-items', [GoodsReceiptItemController::class, 'index'])->name('goods-receipt-items.index');
+Route::get('/supplier-payments', [SupplierPaymentController::class, 'index'])->name('supplier-payments.index');
+Route::get('/recipe-versions', [RecipeVersionController::class, 'index'])->name('recipe-versions.index');
+Route::get('/recipe-ingredients', [RecipeIngredientController::class, 'index'])->name('recipe-ingredients.index');
+Route::get('/recipe-instructions', [RecipeInstructionController::class, 'index'])->name('recipe-instructions.index');
+Route::get('/recipe-other-costs', [RecipeOtherCostController::class, 'index'])->name('recipe-other-costs.index');
+Route::get('/stock-balances', [StockBalanceController::class, 'index'])->name('stock-balances.index');
+Route::get('/stock-movements', [StockMovementController::class, 'index'])->name('stock-movements.index');
+Route::get('/stock-transfers', [StockTransferController::class, 'index'])->name('stock-transfers.index');
+Route::get('/stock-transfer-items', [StockTransferItemController::class, 'index'])->name('stock-transfer-items.index');
+Route::get('/stock-adjustments', [StockAdjustmentController::class, 'index'])->name('stock-adjustments.index');
+Route::get('/stock-adjustment-items', [StockAdjustmentItemController::class, 'index'])->name('stock-adjustment-items.index');
+Route::get('/stock-counts', [StockCountController::class, 'index'])->name('stock-counts.index');
+Route::get('/stock-count-items', [StockCountItemController::class, 'index'])->name('stock-count-items.index');
+Route::get('/stock-wastes', [StockWasteController::class, 'index'])->name('stock-wastes.index');
+Route::get('/stock-waste-items', [StockWasteItemController::class, 'index'])->name('stock-waste-items.index');

@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Concerns\ListsModelRecords;
+use App\Models\GoodsReceiptItem;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+
+class GoodsReceiptItemController extends Controller
+{
+    use ListsModelRecords;
+
+    public function index(Request $request): View
+    {
+        return $this->listing($request, 'goods-receipt-items', GoodsReceiptItem::class, ['batch_number'], ['goodsReceipt', 'ingredient', 'unit']);
+    }
+}
