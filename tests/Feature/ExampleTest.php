@@ -20,6 +20,7 @@ class ExampleTest extends TestCase
             ->assertSee('Build a reliable inventory foundation.')
             ->assertSee('Primary navigation')
             ->assertSee('Workspace navigation')
+            ->assertSee('Ingredient categories')
             ->assertSee('Stock waste')
             ->assertSee('class="app-wrapper"', false)
             ->assertSee('data-lte-toggle="sidebar"', false)
@@ -33,6 +34,7 @@ class ExampleTest extends TestCase
     {
         $pages = [
             ['/items', 'Ingredients', 'No items yet'],
+            ['/ingredient-categories', 'Ingredient categories', 'No ingredient categories yet'],
             ['/stock-locations', 'Stock locations', 'No stock locations yet'],
             ['/stock-wastes', 'Stock waste', 'No waste records yet'],
         ];

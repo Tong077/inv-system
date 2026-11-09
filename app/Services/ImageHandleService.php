@@ -1,7 +1,7 @@
 <?php
+namespace App\Services;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-
 
 class ImageHandleService
 {
@@ -10,32 +10,35 @@ class ImageHandleService
         if (!$image) {
             return null;
         }
-        return $image->store($directory, $disk);
-        // if ($image) {
-        //     return $image->store($directory, $disk);
 
-        // } else {
-        //     return null;
-        // }
+        return $image->store($directory, $disk) ?: null;
     }
+
     public function updateImage(?UploadedFile $newImage, ?string $oldImagePath, string $directory = 'images', string $disk = 'public'): ?string
     {
-        if (!$newImage)
+        if (!$newImage) {
             return $oldImagePath;
-        $newImage = $this->updateImage($newImage, $directory, $disk);
-        if ($oldImagePath && $newImage) {
+        }
+
+        $newImagePath = $this->uploadImage($newImage, $directory, $disk);
+
+        if ($newImagePath && $oldImagePath) {
             $this->deleteImage($oldImagePath, $disk);
         }
-        return $newImage;
+
+        return $newImagePath ?? $oldImagePath;
     }
+
     public function deleteImage(?string $imagePath, string $disk = 'public'): bool
     {
         if (!$imagePath) {
             return false;
         }
-        if (Storage::disk($disk)->exists($imagePath)) {
+
+        if (!Storage::disk($disk)->exists($imagePath)) {
             return false;
         }
+
         return Storage::disk($disk)->delete($imagePath);
     }
 }

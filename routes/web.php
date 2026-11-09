@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoodsReceiptController;
 use App\Http\Controllers\GoodsReceiptItemController;
+use App\Http\Controllers\IngredientCategoryController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\IngredientPriceHistoryController;
 use App\Http\Controllers\MenuCategoryController;
@@ -33,6 +34,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', DashboardController::class)->name('dashboard');
 
 Route::get('/items', [IngredientController::class, 'index'])->name('items.index');
+Route::get('/ingredient-categories', [IngredientCategoryController::class, 'index'])->name('ingredient-categories.index');
 Route::get('/units', [UnitController::class, 'index'])->name('units.index');
 Route::get('/menu-categories', [MenuCategoryController::class, 'index'])->name('menu-categories.index');
 Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');

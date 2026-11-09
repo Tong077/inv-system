@@ -3,17 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Ingredient extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
-        'code', 'name', 'base_unit_id', 'description',
-        'minimum_stock', 'is_active',
+        'code',
+        'name',
+        'ingredient_category_id',
+        'base_unit_id',
+        'description',
+        'minimum_stock',
+        'is_active',
     ];
 
     protected function casts(): array
@@ -57,5 +62,10 @@ class Ingredient extends Model
     public function goodsReceiptItems(): HasMany
     {
         return $this->hasMany(GoodsReceiptItem::class);
+    }
+
+    public function ingredientCategory(): BelongsTo
+    {
+        return $this->belongsTo(IngredientCategory::class);
     }
 }

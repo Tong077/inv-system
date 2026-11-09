@@ -8,9 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class IngredientPriceHistory extends Model
 {
     protected $fillable = [
-        'ingredient_id', 'supplier_id', 'package_price',
-        'package_quantity', 'package_unit_id',
-        'unit_cost', 'effective_date', 'notes',
+        'ingredient_id', 
+        'supplier_id', 
+        'package_price',
+        'package_quantity', 
+        'package_unit_id',
+        'unit_cost', 
+        'effective_date', 
+        'notes',
     ];
 
     protected function casts(): array

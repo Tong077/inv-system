@@ -8,8 +8,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Unit extends Model
 {
     protected $fillable = [
-        'name', 'abbreviation', 'dimension',
-        'conversion_factor_to_base', 'is_base_unit', 'is_active',
+        'name', 
+        'abbreviation',
+         'dimension',
+        'conversion_factor_to_base', 
+        'is_base_unit', 
+        'is_active',
     ];
 
     protected function casts(): array

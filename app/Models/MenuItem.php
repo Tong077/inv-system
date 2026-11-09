@@ -12,8 +12,13 @@ class MenuItem extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'menu_category_id', 'code', 'name',
-        'description', 'selling_price', 'currency', 'is_active',
+        'menu_category_id', 
+        'code', 
+        'name',
+        'description', 
+        'selling_price', 
+        'currency', 
+        'is_active',
     ];
 
     protected function casts(): array

@@ -15,6 +15,28 @@ body {
     min-width: 320px;
 }
 
+.app-sidebar[data-bs-theme="dark"] {
+    --bs-primary-rgb: 160, 220, 172;
+    --lte-sidebar-hover-bg: rgb(255 255 255 / 7%);
+    --lte-sidebar-hover-color: #fff;
+    --lte-sidebar-menu-active-bg: rgb(46 112 62 / 32%);
+    --lte-sidebar-menu-active-color: #b7e5bf;
+    --lte-sidebar-submenu-active-bg: rgb(46 112 62 / 24%);
+    --lte-sidebar-submenu-active-color: #b7e5bf;
+}
+
+.sidebar-wrapper .sidebar-menu > .nav-item > .nav-link,
+.sidebar-wrapper .nav-treeview > .nav-item > .nav-link {
+    border-radius: 0.55rem;
+    transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.sidebar-wrapper .sidebar-menu > .nav-item > .nav-link[aria-current="page"],
+.sidebar-wrapper .nav-treeview > .nav-item > .nav-link[aria-current="page"] {
+    box-shadow: inset 3px 0 0 #83d18e;
+    font-weight: 600;
+}
+
 .select2-container {
     width: 100% !important;
 }

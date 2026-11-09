@@ -4,6 +4,8 @@
     'searchLabel' => 'Search records',
     'searchPlaceholder' => 'Search records',
     'searchValue' => null,
+    'searchContainerClass' => 'flex-grow-1',
+    'searchClass' => '',
     'filters' => [],
     'submitLabel' => 'Search',
     'clearLabel' => 'Clear',
@@ -28,14 +30,14 @@
     @endforeach
 
     @if ($showSearch)
-        <div class="flex-grow-1">
+        <div @class([$searchContainerClass])>
             <label for="filter-{{ \Illuminate\Support\Str::slug($searchName) }}" class="visually-hidden">{{ $searchLabel }}</label>
             <input
                 id="filter-{{ \Illuminate\Support\Str::slug($searchName) }}"
                 type="search"
                 name="{{ $searchName }}"
                 value="{{ $searchValue }}"
-                class="form-control"
+                @class(['form-control', $searchClass])
                 placeholder="{{ $searchPlaceholder }}"
             >
         </div>

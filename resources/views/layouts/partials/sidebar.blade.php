@@ -16,7 +16,7 @@
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
                 <li class="nav-header">WORKSPACE</li>
                 <li class="nav-item">
-                    <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if (request()->routeIs('dashboard')) aria-current="page" @endif>
+                    <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active text-primary' : '' }}" @if (request()->routeIs('dashboard')) aria-current="page" @endif>
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-9Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
                         </svg>
@@ -25,9 +25,16 @@
                 </li>
 
                 @php
+                    $navigationGroupIcons = [
+                        'INVENTORY SETUP' => 'bi-box-seam-fill',
+                        'PURCHASING & RECEIVING' => 'bi-cart-fill',
+                        'RECIPES & MENU' => 'bi-journal-richtext',
+                        'STOCK OPERATIONS' => 'bi-clipboard-data-fill',
+                    ];
                     $navigationGroups = [
                         'INVENTORY SETUP' => [
                             ['label' => 'Ingredients', 'route' => 'items.index', 'pattern' => 'items.*', 'icon' => 'bi-box-seam'],
+                            ['label' => 'Ingredient categories', 'route' => 'ingredient-categories.index', 'pattern' => 'ingredient-categories.*', 'icon' => 'bi-tags'],
                             ['label' => 'Units of measure', 'route' => 'units.index', 'pattern' => 'units.*', 'icon' => 'bi-rulers'],
                             ['label' => 'Stock locations', 'route' => 'stock-locations.index', 'pattern' => 'stock-locations.*', 'icon' => 'bi-geo-alt'],
                             ['label' => 'Stock on hand', 'route' => 'stock-balances.index', 'pattern' => 'stock-balances.*', 'icon' => 'bi-boxes'],
@@ -65,19 +72,38 @@
                 @endphp
 
                 @foreach ($navigationGroups as $group => $links)
-                    <li class="nav-header">{{ $group }}</li>
-                    @foreach ($links as $link)
-                        <li class="nav-item">
-                            <a
-                                href="{{ route($link['route']) }}"
-                                class="nav-link {{ request()->routeIs($link['pattern']) ? 'active' : '' }}"
-                                @if (request()->routeIs($link['pattern'])) aria-current="page" @endif
-                            >
-                                <i class="nav-icon bi {{ $link['icon'] }}" aria-hidden="true"></i>
-                                <p>{{ $link['label'] }}</p>
-                            </a>
-                        </li>
-                    @endforeach
+                    @php
+                        $groupIsActive = collect($links)->contains(fn (array $link): bool => request()->routeIs($link['pattern']));
+                        $submenuId = \Illuminate\Support\Str::slug($group).'-menu';
+                    @endphp
+                    <li class="nav-item {{ $groupIsActive ? 'menu-open' : '' }}">
+                        <a
+                            href="#"
+                            class="nav-link {{ $groupIsActive ? 'active text-primary' : '' }}"
+                            aria-expanded="{{ $groupIsActive ? 'true' : 'false' }}"
+                            aria-controls="{{ $submenuId }}"
+                        >
+                            <i class="nav-icon bi {{ $navigationGroupIcons[$group] }}" aria-hidden="true"></i>
+                            <p>
+                                {{ $group }}
+                                <i class="nav-arrow bi bi-chevron-right" aria-hidden="true"></i>
+                            </p>
+                        </a>
+                        <ul id="{{ $submenuId }}" class="nav nav-treeview" style="display: {{ $groupIsActive ? 'block' : 'none' }};">
+                            @foreach ($links as $link)
+                                <li class="nav-item">
+                                    <a
+                                        href="{{ route($link['route']) }}"
+                                        class="nav-link {{ request()->routeIs($link['pattern']) ? 'active text-primary' : '' }}"
+                                        @if (request()->routeIs($link['pattern'])) aria-current="page" @endif
+                                    >
+                                        <i class="nav-icon bi {{ $link['icon'] }}" aria-hidden="true"></i>
+                                        <p>{{ $link['label'] }}</p>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </li>
                 @endforeach
             </ul>
         </nav>

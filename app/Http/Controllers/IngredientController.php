@@ -29,6 +29,11 @@ class IngredientController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        return view('items.index', compact('ingredients', 'search', 'status'));
+        return view('items.index', [
+            'ingredients' => $ingredients,
+            'records' => $ingredients,
+            'search' => $search,
+            'status' => $status,
+        ]);
     }
 }

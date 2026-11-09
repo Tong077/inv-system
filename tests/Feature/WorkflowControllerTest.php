@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Ingredient;
+use App\Models\IngredientCategory;
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -48,6 +50,57 @@ class WorkflowControllerTest extends TestCase
             ->assertDontSee('Millilitre');
     }
 
+    public function test_search_filter_allows_custom_width_classes(): void
+    {
+        $this->blade('<x-search-filter search-container-class="col-md-4" search-class="border-success" />')
+            ->assertSee('class="col-md-4"', false)
+            ->assertSee('class="form-control border-success"', false);
+    }
+
+    public function test_ingredient_categories_display_parent_count_and_support_search_and_status_filter(): void
+    {
+        $parent = IngredientCategory::create([
+            'name' => 'Produce',
+            'description' => 'Fruit and vegetables',
+            'is_active' => true,
+        ]);
+        $child = IngredientCategory::create([
+            'parent_id' => $parent->id,
+            'name' => 'Leafy greens',
+            'description' => 'Fresh greens',
+            'is_active' => true,
+        ]);
+        $unit = Unit::create([
+            'name' => 'Kilogram',
+            'abbreviation' => 'kg',
+            'dimension' => 'mass',
+            'conversion_factor_to_base' => 1,
+            'is_base_unit' => true,
+            'is_active' => true,
+        ]);
+        Ingredient::create([
+            'code' => 'LETTUCE',
+            'name' => 'Lettuce',
+            'ingredient_category_id' => $child->id,
+            'base_unit_id' => $unit->id,
+            'minimum_stock' => 0,
+            'is_active' => true,
+        ]);
+        IngredientCategory::create([
+            'name' => 'Archived category',
+            'is_active' => false,
+        ]);
+
+        $this->get(route('ingredient-categories.index', ['search' => 'Leafy', 'status' => 'active']))
+            ->assertOk()
+            ->assertSee('Leafy greens')
+            ->assertSee('Produce')
+            ->assertSee('class="w-50"', false)
+            ->assertSee('class="w-25"', false)
+            ->assertSee('1', false)
+            ->assertDontSee('Archived category');
+    }
+
     public function test_table_component_paginates_and_preserves_search_query(): void
     {
         foreach (range(1, 16) as $number) {
@@ -79,7 +132,7 @@ class WorkflowControllerTest extends TestCase
     public function test_inventory_workflow_pages_load_from_their_database_models(): void
     {
         $resources = [
-            'units', 'menu-categories', 'suppliers', 'supplier-contacts',
+            'units', 'menu-categories', 'ingredient-categories', 'suppliers', 'supplier-contacts',
             'stock-locations', 'menu-items', 'ingredient-price-histories',
             'purchase-orders', 'purchase-order-items', 'goods-receipts',
             'goods-receipt-items', 'supplier-payments', 'recipe-versions',
@@ -105,6 +158,7 @@ class WorkflowControllerTest extends TestCase
 
         $routes = [
             'items.index',
+            'ingredient-categories.index',
             'units.index',
             'stock-locations.index',
             'stock-balances.index',
@@ -135,6 +189,36 @@ class WorkflowControllerTest extends TestCase
 
         foreach ($routes as $routeName) {
             $response->assertSee(route($routeName), false);
+
+            $currentPage = $this->get(route($routeName))->assertOk()->getContent();
+
+            $this->assertMatchesRegularExpression(
+                '/<a\s+href="'.preg_quote(route($routeName), '/').'"\s+class="nav-link active text-primary"[\s\S]*?aria-current="page"/',
+                $currentPage,
+            );
+            $this->assertStringContainsString('class="nav-item menu-open"', $currentPage);
+            $this->assertStringContainsString('aria-expanded="true"', $currentPage);
         }
+    }
+
+    public function test_sidebar_expands_only_the_group_for_the_current_route(): void
+    {
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('class="nav-link active text-primary"', false)
+            ->assertSee('aria-current="page"', false);
+
+        $this->get(route('ingredient-categories.index'))
+            ->assertOk()
+            ->assertSee('class="nav-item menu-open"', false)
+            ->assertSee('aria-expanded="true"', false)
+            ->assertSee('aria-expanded="false"', false)
+            ->assertSee('class="nav nav-treeview"', false)
+            ->assertSee('aria-current="page"', false);
+
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertDontSee('class="nav-item menu-open"', false)
+            ->assertSee('aria-expanded="false"', false);
     }
 }

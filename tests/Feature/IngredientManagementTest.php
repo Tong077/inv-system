@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Ingredient;
+use App\Models\IngredientCategory;
 use App\Models\StockBalance;
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,9 +17,11 @@ class IngredientManagementTest extends TestCase
     public function test_ingredient_index_uses_database_records_and_stock_balances(): void
     {
         $unit = $this->createUnit();
+        $category = IngredientCategory::create(['name' => 'Produce']);
         $ingredient = Ingredient::create([
             'code' => 'CHICKEN',
             'name' => 'Chicken breast',
+            'ingredient_category_id' => $category->id,
             'base_unit_id' => $unit->id,
             'minimum_stock' => 2.5,
             'is_active' => true,
@@ -63,9 +66,11 @@ class IngredientManagementTest extends TestCase
 
     public function test_dashboard_displays_live_database_totals(): void
     {
+        $category = IngredientCategory::create(['name' => 'Seasoning']);
         Ingredient::create([
             'code' => 'SALT',
             'name' => 'Salt',
+            'ingredient_category_id' => $category->id,
             'base_unit_id' => $this->createUnit()->id,
             'minimum_stock' => 0,
             'is_active' => true,
