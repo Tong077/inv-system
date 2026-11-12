@@ -1,0 +1,12 @@
+<x-table :rows="$items" caption="Goods receipt lines" :empty-title="$search !== '' ? 'No matching receipt lines' : 'No receipt lines yet'" :empty-description="$search !== '' ? 'Try changing your search.' : 'Choose a draft receipt and add its delivered items.'">
+    <x-slot:toolbar><div class="unit-toolbar">
+        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="offcanvas" data-bs-target="#createGoodsReceiptItemDrawer" aria-label="Add receipt line"><i class="bi bi-plus-lg" aria-hidden="true"></i></button>
+        <x-search-filter :action="route('goods-receipt-items.index')" search-label="Search receipt lines" search-placeholder="Search ingredient, batch, or receipt" search-container-class="unit-search-field" class="unit-search-filter" data-live-search="true" data-live-target="#goods-receipt-item-results" data-live-delay="300" submit-label="Filter" :search-value="$search" :preserve="$receiptId ? ['goods_receipt_id'] : []" />
+    </div></x-slot:toolbar>
+    <x-slot:head><tr><th>Receipt</th><th>Ingredient</th><th class="text-end">Ordered</th><th class="text-end">Received</th><th>Unit</th><th class="text-end">Unit price</th><th>Batch</th><th>Expiry</th><th class="text-end">Actions</th></tr></x-slot:head>
+    <x-slot:body>@foreach($items as $item)<tr>
+        <td>{{ $item->goodsReceipt?->receipt_number }}</td><td>{{ $item->ingredient?->name }}</td><td class="text-end">{{ number_format((float)$item->quantity_ordered,3) }}</td><td class="text-end">{{ number_format((float)$item->quantity_received,3) }}</td><td>{{ $item->unit?->abbreviation }}</td><td class="text-end">{{ number_format((float)$item->unit_price,2) }}</td><td>{{ $item->batch_number ?: '—' }}</td><td>{{ $item->expiry_date?->format('M j, Y') ?? '—' }}</td>
+        <td class="text-end text-nowrap">@if($item->goodsReceipt?->status==='draft')<button class="btn btn-sm btn-outline-primary" data-bs-toggle="offcanvas" data-bs-target="#editGoodsReceiptItemDrawer-{{ $item->id }}" aria-label="Edit line for {{ $item->ingredient?->name }}"><i class="bi bi-pencil" aria-hidden="true"></i></button><x-confirm-delete :action="route('goods-receipt-items.destroy',$item).($receiptId?'?goods_receipt_id='.$receiptId:'')" :title="'Delete '.$item->ingredient?->name.' receipt line?'" :button-aria-label="'Delete '.$item->ingredient?->name"><i class="bi bi-trash" aria-hidden="true"></i></x-confirm-delete>@endif</td>
+    </tr>@endforeach</x-slot:body>
+</x-table>
+<div data-live-edit-drawers>@include('goods-receipt-items.partials.edit-drawers')</div>

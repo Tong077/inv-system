@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Ingredient extends Model
 {
@@ -17,6 +19,7 @@ class Ingredient extends Model
         'ingredient_category_id',
         'base_unit_id',
         'description',
+        'image_path',
         'minimum_stock',
         'is_active',
     ];
@@ -37,6 +40,19 @@ class Ingredient extends Model
     public function priceHistories(): HasMany
     {
         return $this->hasMany(IngredientPriceHistory::class);
+    }
+
+    public function latestOrderablePriceHistory(): HasOne
+    {
+        return $this->hasOne(IngredientPriceHistory::class)
+            ->whereHas('supplier', fn ($query) => $query->where('is_active', true))
+            ->whereHas('packageUnit', fn ($query) => $query->where('is_active', true))
+            ->latestOfMany('effective_date');
+    }
+
+    public function latestPriceHistory(): HasOne
+    {
+        return $this->hasOne(IngredientPriceHistory::class)->latestOfMany('effective_date');
     }
 
     public function recipeIngredients(): HasMany
@@ -67,5 +83,12 @@ class Ingredient extends Model
     public function ingredientCategory(): BelongsTo
     {
         return $this->belongsTo(IngredientCategory::class);
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image_path !== null
+            ? Storage::disk('public')->url($this->image_path)
+            : null;
     }
 }

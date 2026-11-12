@@ -57,6 +57,16 @@ class WorkflowControllerTest extends TestCase
             ->assertSee('class="form-control border-success"', false);
     }
 
+    public function test_ingredient_category_toolbar_keeps_add_search_and_status_controls_together(): void
+    {
+        $this->get(route('ingredient-categories.index'))
+            ->assertOk()
+            ->assertSee('class="category-toolbar"', false)
+            ->assertSeeInOrder(['Add category', 'category-search-filter'], false)
+            ->assertSee('category-search-field', false)
+            ->assertSee('category-status-filter', false);
+    }
+
     public function test_ingredient_categories_display_parent_count_and_support_search_and_status_filter(): void
     {
         $parent = IngredientCategory::create([
@@ -95,8 +105,9 @@ class WorkflowControllerTest extends TestCase
             ->assertOk()
             ->assertSee('Leafy greens')
             ->assertSee('Produce')
-            ->assertSee('class="w-50"', false)
-            ->assertSee('class="w-25"', false)
+            ->assertSee('category-search-filter', false)
+            ->assertSee('category-search-field', false)
+            ->assertSee('category-status-filter', false)
             ->assertSee('1', false)
             ->assertDontSee('Archived category');
     }

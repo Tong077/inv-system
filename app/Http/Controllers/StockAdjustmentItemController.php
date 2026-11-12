@@ -1,18 +1,12 @@
 <?php
-
 namespace App\Http\Controllers;
-
-use App\Http\Controllers\Concerns\ListsModelRecords;
-use App\Models\StockAdjustmentItem;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
-
+use App\Models\StockAdjustmentItem;use App\Services\StockAdjustmentItemService;use Illuminate\Contracts\View\View;use Illuminate\Http\Request;use Illuminate\Http\Response;use Illuminate\Http\RedirectResponse;use Illuminate\Support\Facades\Validator;use Illuminate\Validation\Rule;use Illuminate\Validation\ValidationException;use Throwable;
 class StockAdjustmentItemController extends Controller
 {
-    use ListsModelRecords;
-
-    public function index(Request $request): View
-    {
-        return $this->listing($request, 'stock-adjustment-items', StockAdjustmentItem::class, [], ['stockAdjustment', 'ingredient']);
-    }
+ public function __construct(private readonly StockAdjustmentItemService $service){}
+ public function index(Request $r):View|Response{$s=$r->string('search')->trim()->limit(100)->toString();$id=$r->integer('stock_adjustment_id')?:null;$d=[...$this->service->options(),'items'=>$this->service->getAll($s,$id),'search'=>$s,'adjustmentId'=>$id];return $r->header('X-Live-Search')==='true'?response()->view('stock-adjustment-items.partials.results',$d):view('stock-adjustment-items.index',$d);}
+ public function store(Request $r):RedirectResponse{$v=Validator::make($r->all(),$this->rules());if($v->fails())return back()->withErrors($v)->withInput()->with('openStockAdjustmentItemDrawer','create');try{$this->service->create($v->validated());}catch(ValidationException $e){return back()->withErrors($e->errors())->withInput()->with('openStockAdjustmentItemDrawer','create');}catch(Throwable $e){report($e);return back()->withInput()->with('error','Adjustment line could not be added.');}return to_route('stock-adjustment-items.index',$r->only('stock_adjustment_id'))->with('success','Adjustment line added.');}
+ public function update(Request $r,StockAdjustmentItem $stockAdjustmentItem):RedirectResponse{$v=Validator::make($r->all(),$this->rules());if($v->fails())return back()->withErrors($v)->withInput()->with('openStockAdjustmentItemDrawer',$stockAdjustmentItem->id);try{$this->service->update($stockAdjustmentItem,$v->validated());}catch(ValidationException $e){return back()->withErrors($e->errors())->withInput()->with('openStockAdjustmentItemDrawer',$stockAdjustmentItem->id);}catch(Throwable $e){report($e);return back()->withInput()->with('error','Adjustment line could not be updated.');}return to_route('stock-adjustment-items.index',$r->only('stock_adjustment_id'))->with('success','Adjustment line updated.');}
+ public function destroy(Request $r,StockAdjustmentItem $stockAdjustmentItem):RedirectResponse{try{if(!$this->service->delete($stockAdjustmentItem))return back()->with('warning','Only lines on draft adjustments can be deleted.');}catch(Throwable $e){report($e);return back()->with('error','Adjustment line could not be deleted.');}return to_route('stock-adjustment-items.index',$r->only('stock_adjustment_id'))->with('success','Adjustment line deleted.');}
+ private function rules():array{return ['stock_adjustment_id'=>['required','integer',Rule::exists('stock_adjustments','id')->where('status','draft')],'ingredient_id'=>['required','integer','exists:ingredients,id'],'adjusted_quantity'=>['required','numeric','min:0','max:999999999999.999','decimal:0,3']];}
 }

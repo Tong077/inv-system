@@ -63,6 +63,8 @@
                 :container-class="$filter['class'] ?? 'workflow-filter'"
                 select-class="workflow-filter"
                 :allow-clear="false"
+                :show-placeholder-option="$filter['showPlaceholderOption'] ?? true"
+                :reset-value="$filter['resetValue'] ?? null"
             />
         @else
             <div class="{{ $filter['class'] ?? 'workflow-filter' }}">
@@ -86,6 +88,6 @@
 
     <button class="btn btn-light border" type="submit">{{ $submitLabel }}</button>
     @if ($hasFilters)
-        <a href="{{ $action }}" class="btn btn-light border">{{ $clearLabel }}</a>
+        <a href="{{ $action }}" class="btn btn-light border search-filter-clear">{{ $clearLabel }}</a>
     @endif
 </form>

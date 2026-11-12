@@ -1,18 +1,12 @@
 <?php
-
 namespace App\Http\Controllers;
-
-use App\Http\Controllers\Concerns\ListsModelRecords;
-use App\Models\StockTransferItem;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
-
+use App\Models\StockTransferItem;use App\Services\StockTransferItemService;use Illuminate\Contracts\View\View;use Illuminate\Http\Request;use Illuminate\Http\Response;use Illuminate\Http\RedirectResponse;use Illuminate\Support\Facades\Validator;use Illuminate\Validation\Rule;use Illuminate\Validation\ValidationException;use Throwable;
 class StockTransferItemController extends Controller
 {
-    use ListsModelRecords;
-
-    public function index(Request $request): View
-    {
-        return $this->listing($request, 'stock-transfer-items', StockTransferItem::class, [], ['stockTransfer', 'ingredient', 'unit']);
-    }
+ public function __construct(private readonly StockTransferItemService $service){}
+ public function index(Request $r):View|Response{$s=$r->string('search')->trim()->limit(100)->toString();$tid=$r->integer('stock_transfer_id')?:null;$d=[...$this->service->options(),'items'=>$this->service->getAll($s,$tid),'search'=>$s,'transferId'=>$tid];return $r->header('X-Live-Search')==='true'?response()->view('stock-transfer-items.partials.results',$d):view('stock-transfer-items.index',$d);}
+ public function store(Request $r):RedirectResponse{$v=Validator::make($r->all(),$this->rules());if($v->fails())return back()->withErrors($v)->withInput()->with('openStockTransferItemDrawer','create');try{$this->service->create($v->validated());}catch(ValidationException $e){return back()->withErrors($e->errors())->withInput()->with('openStockTransferItemDrawer','create');}catch(Throwable $e){report($e);return back()->withInput()->with('error','The transfer line could not be added.');}return to_route('stock-transfer-items.index',$r->only('stock_transfer_id'))->with('success','Transfer line added.');}
+ public function update(Request $r,StockTransferItem $stockTransferItem):RedirectResponse{$v=Validator::make($r->all(),$this->rules());if($v->fails())return back()->withErrors($v)->withInput()->with('openStockTransferItemDrawer',$stockTransferItem->id);try{$this->service->update($stockTransferItem,$v->validated());}catch(ValidationException $e){return back()->withErrors($e->errors())->withInput()->with('openStockTransferItemDrawer',$stockTransferItem->id);}catch(Throwable $e){report($e);return back()->withInput()->with('error','The transfer line could not be updated.');}return to_route('stock-transfer-items.index',$r->only('stock_transfer_id'))->with('success','Transfer line updated.');}
+ public function destroy(Request $r,StockTransferItem $stockTransferItem):RedirectResponse{try{if(!$this->service->delete($stockTransferItem))return back()->with('warning','Only lines on draft transfers can be deleted.');}catch(Throwable $e){report($e);return back()->with('error','The transfer line could not be deleted.');}return to_route('stock-transfer-items.index',$r->only('stock_transfer_id'))->with('success','Transfer line deleted.');}
+ private function rules():array{return ['stock_transfer_id'=>['required','integer',Rule::exists('stock_transfers','id')->where('status','draft')],'ingredient_id'=>['required','integer','exists:ingredients,id'],'quantity'=>['required','numeric','gt:0','max:999999999999.999','decimal:0,3'],'unit_id'=>['required','integer','exists:units,id']];}
 }

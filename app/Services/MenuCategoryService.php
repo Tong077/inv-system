@@ -1,41 +1,49 @@
 <?php
+
 namespace App\Services;
+
 use App\Models\MenuCategory;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 
 class MenuCategoryService
 {
-    public function getAllMenuCategories()
+    public function getAllMenuCategories(?string $search = null, ?string $status = null): LengthAwarePaginator
     {
-        $all_menu_categories = MenuCategory::all();
-        return $all_menu_categories;
+        return MenuCategory::query()
+            ->withCount('menuItems')
+            ->when($search !== null && $search !== '', function (Builder $query) use ($search): void {
+                $query->where(function (Builder $query) use ($search): void {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->when(in_array($status, ['active', 'inactive'], true), function (Builder $query) use ($status): void {
+                $query->where('is_active', $status === 'active');
+            })
+            ->orderBy('name')
+            ->paginate(15)
+            ->withQueryString();
     }
-    public function getMenuCategoryById($id)
+
+    public function createMenuCategory(array $data): MenuCategory
     {
-        $menu_category = MenuCategory::find($id);
-        return $menu_category;
+        return MenuCategory::create($data);
     }
-    public function createMenuCategory(array $data)
+
+    public function updateMenuCategory(MenuCategory $menuCategory, array $data): MenuCategory
     {
-        $menu_category = MenuCategory::create($data);
-        return $menu_category;
+        $menuCategory->update($data);
+
+        return $menuCategory->refresh();
     }
-    public function updateMenuCategory($id, array $data)
+
+    public function deleteMenuCategory(MenuCategory $menuCategory): bool
     {
-        $menu_category = MenuCategory::find($id);
-        if ($menu_category) {
-            $menu_category->update($data);
-            return $menu_category;
+        if ($menuCategory->menuItems()->withTrashed()->exists()) {
+            return false;
         }
-        return null;
+
+        return (bool) $menuCategory->delete();
     }
-    public function deleteMenuCategory($id)
-    {
-        $menu_category = MenuCategory::find($id);
-        if ($menu_category) {
-            $menu_category->delete();
-            return true;
-        }
-        return false;
-    }
-    
 }

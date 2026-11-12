@@ -9,6 +9,8 @@
     'disabled' => false,
     'multiple' => false,
     'allowClear' => true,
+    'showPlaceholderOption' => true,
+    'resetValue' => null,
     'minimumResultsForSearch' => 0,
     'containerClass' => '',
     'selectClass' => '',
@@ -38,15 +40,16 @@
         data-select2="true"
         data-placeholder="{{ $placeholder }}"
         data-allow-clear="{{ $allowClear ? 'true' : 'false' }}"
+        data-reset-value="{{ $resetValue ?? '' }}"
         data-minimum-results-for-search="{{ $minimumResultsForSearch }}"
         @required($required)
         @disabled($disabled)
         @multiple($multiple)
         {{ $attributes->except(['id'])->merge() }}
     >
-        @unless ($multiple)
+        @if (! $multiple && $showPlaceholderOption)
             <option value=""></option>
-        @endunless
+        @endif
         @foreach ($options as $optionValue => $optionLabel)
             <option value="{{ $optionValue }}" @selected(in_array((string) $optionValue, $selectedValues, true))>
                 {{ $optionLabel }}

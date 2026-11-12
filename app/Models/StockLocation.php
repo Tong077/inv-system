@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class StockLocation extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'code', 'name', 'location_type', 'address', 'is_active',
     ];

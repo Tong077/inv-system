@@ -47,4 +47,27 @@ class ExampleTest extends TestCase
                 ->assertSee('aria-current="page"', false);
         }
     }
+
+    public function test_success_feedback_renders_as_a_styled_toast(): void
+    {
+        $this->withSession(['success' => 'Ingredient category saved.'])
+            ->get('/')
+            ->assertOk()
+            ->assertSee('class="toast toast-success border-0"', false)
+            ->assertSee('bi-check-lg', false)
+            ->assertSee('Success')
+            ->assertSee('Ingredient category saved.')
+            ->assertSee('data-bs-autohide="true"', false);
+    }
+
+    public function test_ingredient_and_menu_forms_render_the_image_upload_dropzone(): void
+    {
+        foreach (['items.index', 'menu-items.index'] as $route) {
+            $this->get(route($route))
+                ->assertOk()
+                ->assertSee('data-image-dropzone', false)
+                ->assertSee('data-image-preview-input', false)
+                ->assertSee('Drag and drop an image, or');
+        }
+    }
 }

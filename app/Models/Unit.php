@@ -35,6 +35,31 @@ class Unit extends Model
         return $this->hasMany(RecipeIngredient::class);
     }
 
+    public function recipeVersions(): HasMany
+    {
+        return $this->hasMany(RecipeVersion::class, 'yield_unit_id');
+    }
+
+    public function purchaseOrderItems(): HasMany
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
+    }
+
+    public function goodsReceiptItems(): HasMany
+    {
+        return $this->hasMany(GoodsReceiptItem::class);
+    }
+
+    public function stockWasteItems(): HasMany
+    {
+        return $this->hasMany(StockWasteItem::class);
+    }
+
+    public function stockTransferItems(): HasMany
+    {
+        return $this->hasMany(StockTransferItem::class);
+    }
+
     public function priceHistories(): HasMany
     {
         return $this->hasMany(IngredientPriceHistory::class, 'package_unit_id');

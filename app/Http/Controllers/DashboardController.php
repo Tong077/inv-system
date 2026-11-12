@@ -2,19 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ingredient;
-use App\Models\StockLocation;
-use App\Models\StockWaste;
+use App\Services\InventoryReportService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function __invoke(): View
+    public function __construct(private readonly InventoryReportService $reports) {}
+
+    public function __invoke(Request $request): View
     {
-        return view('dashboard', [
-            'ingredientCount' => Ingredient::count(),
-            'locationCount' => StockLocation::where('is_active', true)->count(),
-            'postedWasteCount' => StockWaste::where('status', 'posted')->count(),
-        ]);
+        $ingredientId = $request->integer('ingredient_id');
+        return view('dashboard', $this->reports->dashboard($ingredientId > 0 ? $ingredientId : null));
     }
 }

@@ -29,12 +29,13 @@
                         'INVENTORY SETUP' => 'bi-box-seam-fill',
                         'PURCHASING & RECEIVING' => 'bi-cart-fill',
                         'RECIPES & MENU' => 'bi-journal-richtext',
+                        'SALES & POS' => 'bi-receipt-cutoff',
                         'STOCK OPERATIONS' => 'bi-clipboard-data-fill',
                     ];
                     $navigationGroups = [
                         'INVENTORY SETUP' => [
-                            ['label' => 'Ingredients', 'route' => 'items.index', 'pattern' => 'items.*', 'icon' => 'bi-box-seam'],
-                            ['label' => 'Ingredient categories', 'route' => 'ingredient-categories.index', 'pattern' => 'ingredient-categories.*', 'icon' => 'bi-tags'],
+                            ['label' => 'Inventory items', 'route' => 'items.index', 'pattern' => 'items.*', 'icon' => 'bi-box-seam'],
+                            ['label' => 'Inventory categories', 'route' => 'ingredient-categories.index', 'pattern' => 'ingredient-categories.*', 'icon' => 'bi-tags'],
                             ['label' => 'Units of measure', 'route' => 'units.index', 'pattern' => 'units.*', 'icon' => 'bi-rulers'],
                             ['label' => 'Stock locations', 'route' => 'stock-locations.index', 'pattern' => 'stock-locations.*', 'icon' => 'bi-geo-alt'],
                             ['label' => 'Stock on hand', 'route' => 'stock-balances.index', 'pattern' => 'stock-balances.*', 'icon' => 'bi-boxes'],
@@ -57,6 +58,10 @@
                             ['label' => 'Recipe ingredients', 'route' => 'recipe-ingredients.index', 'pattern' => 'recipe-ingredients.*', 'icon' => 'bi-basket'],
                             ['label' => 'Recipe instructions', 'route' => 'recipe-instructions.index', 'pattern' => 'recipe-instructions.*', 'icon' => 'bi-list-ol'],
                             ['label' => 'Other recipe costs', 'route' => 'recipe-other-costs.index', 'pattern' => 'recipe-other-costs.*', 'icon' => 'bi-calculator'],
+                        ],
+                        'SALES & POS' => [
+                            ['label' => 'Point of sale', 'route' => 'pos.index', 'pattern' => 'pos.*', 'icon' => 'bi-shop'],
+                            ['label' => 'Sales history', 'route' => 'sales.index', 'pattern' => 'sales.*', 'icon' => 'bi-receipt'],
                         ],
                         'STOCK OPERATIONS' => [
                             ['label' => 'Transfers', 'route' => 'stock-transfers.index', 'pattern' => 'stock-transfers.*', 'icon' => 'bi-arrow-left-right'],

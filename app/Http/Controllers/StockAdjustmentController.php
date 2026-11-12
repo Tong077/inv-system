@@ -1,18 +1,13 @@
 <?php
-
 namespace App\Http\Controllers;
-
-use App\Http\Controllers\Concerns\ListsModelRecords;
-use App\Models\StockAdjustment;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
-
+use App\Models\StockAdjustment;use App\Services\StockAdjustmentService;use Illuminate\Contracts\View\View;use Illuminate\Http\Request;use Illuminate\Http\Response;use Illuminate\Http\RedirectResponse;use Illuminate\Support\Facades\Validator;use Illuminate\Validation\ValidationException;use Throwable;
 class StockAdjustmentController extends Controller
 {
-    use ListsModelRecords;
-
-    public function index(Request $request): View
-    {
-        return $this->listing($request, 'stock-adjustments', StockAdjustment::class, ['adjustment_number', 'reason', 'status', 'notes'], ['stockLocation']);
-    }
+ public function __construct(private readonly StockAdjustmentService $service){}
+ public function index(Request $r):View|Response{$s=$r->string('search')->trim()->limit(100)->toString();$st=$r->query('status');$d=['adjustments'=>$this->service->getAll($s,is_string($st)?$st:null),'locations'=>$this->service->locations(),'search'=>$s,'status'=>$st];return $r->header('X-Live-Search')==='true'?response()->view('stock-adjustments.partials.results',$d):view('stock-adjustments.index',$d);}
+ public function store(Request $r):RedirectResponse{$v=Validator::make($r->all(),$this->rules());if($v->fails())return back()->withErrors($v)->withInput()->with('openStockAdjustmentDrawer','create');try{$this->service->create($v->validated());}catch(Throwable $e){report($e);return back()->withInput()->with('error','The adjustment could not be created.');}return to_route('stock-adjustments.index')->with('success','Adjustment draft created.');}
+ public function update(Request $r,StockAdjustment $stockAdjustment):RedirectResponse{$v=Validator::make($r->all(),$this->rules());if($v->fails())return back()->withErrors($v)->withInput()->with('openStockAdjustmentDrawer',$stockAdjustment->id);try{$this->service->update($stockAdjustment,$v->validated());}catch(ValidationException $e){return back()->withErrors($e->errors())->withInput()->with('openStockAdjustmentDrawer',$stockAdjustment->id);}catch(Throwable $e){report($e);return back()->withInput()->with('error','The adjustment could not be updated.');}return to_route('stock-adjustments.index')->with('success','Adjustment updated.');}
+ public function post(StockAdjustment $stockAdjustment):RedirectResponse{try{$this->service->post($stockAdjustment);}catch(ValidationException $e){return back()->withErrors($e->errors())->with('error','Adjustment could not be posted.');}catch(Throwable $e){report($e);return back()->with('error','Adjustment could not be posted.');}return to_route('stock-adjustments.index')->with('success','Adjustment posted and stock reconciled.');}
+ public function destroy(StockAdjustment $stockAdjustment):RedirectResponse{try{if(!$this->service->delete($stockAdjustment))return back()->with('warning','Only draft adjustments can be deleted.');}catch(Throwable $e){report($e);return back()->with('error','Adjustment could not be deleted.');}return to_route('stock-adjustments.index')->with('success','Adjustment deleted.');}
+ private function rules():array{return ['stock_location_id'=>['required','integer','exists:stock_locations,id'],'adjustment_date'=>['required','date'],'reason'=>['required','string','max:200'],'notes'=>['nullable','string']];}
 }
